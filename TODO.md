@@ -38,3 +38,4 @@ Because we only want to extrapolate one dataset and the others don't really have
 - GSL reference https://www.gnu.org/software/gsl/doc/html/index.html
 - Kore reference https://docs.kore.io/4.2.0/api/
 - RPPI DATA https://www.bnm.md/ro/search?hashtags[0]=Indicele%20pre%C8%9Bului%20bunurilor%20imobile%20reziden%C8%9Biale
+- [JSON MODEL](MODEL.md)
