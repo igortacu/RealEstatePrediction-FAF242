@@ -4,64 +4,68 @@ import { Card } from '../ui/Card';
 import { Slider } from '../ui/Slider';
 import { NumberInput } from '../ui/NumberInput';
 import { CalculationResult } from '../ui/CalculationResult';
+import type { ApiInput, ApiOutput } from '../../types/api';
 
 const MortgageCalculator: React.FC = () => {
-  // State
-  const [homePrice, setHomePrice] = useState(500000);
-  const [downPayment, setDownPayment] = useState(100000);
-  const [downPaymentPercent, setDownPaymentPercent] = useState(20);
-  const [loanTerm, setLoanTerm] = useState(30);
-  const [interestRate, setInterestRate] = useState(4.5);
-  const [monthlyPayment, setMonthlyPayment] = useState(0);
-  const [totalPayment, setTotalPayment] = useState(0);
-  const [totalInterest, setTotalInterest] = useState(0);
+  const [houseNumber, setHouseNumber] = useState(1);
+  const [houses, setHouses] = useState<ApiInput['Houses']>([{
+    "Money Available": 100000,
+    "House Price": 500000,
+    "Tax Rate": 5,
+    "Yearly Effective Tax Rate": 4,
+    "Term": 30
+  }]);
+  
+  const [calculationResult, setCalculationResult] = useState<ApiOutput>({
+    "Monthly Payment": 0,
+    "Yearly Payment": 0,
+    "Money Enough": false,
+    "Repayment Time": 0,
+    "Profit Rate": 0,
+    "Repayment Graph": [],
+    "Risk Rate": 0
+  });
 
-  // Calculate mortgage when inputs change
   useEffect(() => {
     calculateMortgage();
-  }, [homePrice, downPayment, loanTerm, interestRate]);
+  }, [houses, houseNumber]);
 
-  // Handle down payment changes
-  const handleDownPaymentChange = (value: number) => {
-    setDownPayment(value);
-    setDownPaymentPercent(Math.round((value / homePrice) * 100));
-  };
-
-  const handleDownPaymentPercentChange = (value: number) => {
-    setDownPaymentPercent(value);
-    setDownPayment(Math.round((value / 100) * homePrice));
-  };
-
-  // Handle home price changes
-  const handleHomePriceChange = (value: number) => {
-    setHomePrice(value);
-    setDownPayment(Math.round((downPaymentPercent / 100) * value));
-  };
-
-  // Calculate mortgage
   const calculateMortgage = () => {
-    const principal = homePrice - downPayment;
-    const monthlyInterest = interestRate / 100 / 12;
-    const payments = loanTerm * 12;
-    
-    if (principal <= 0 || monthlyInterest <= 0 || payments <= 0) {
-      setMonthlyPayment(0);
-      setTotalPayment(0);
-      setTotalInterest(0);
-      return;
-    }
+    // Here we would normally make an API call with the input data
+    const apiInput: ApiInput = {
+      "House Number": houseNumber,
+      "Houses": houses
+    };
 
-    // Calculate monthly payment: P * r * (1 + r)^n / ((1 + r)^n - 1)
+    // Temporary calculation logic until API is integrated
+    const currentHouse = houses[0];
+    const principal = currentHouse["House Price"] - currentHouse["Money Available"];
+    const monthlyInterest = currentHouse["Yearly Effective Tax Rate"] / 100 / 12;
+    const payments = currentHouse["Term"] * 12;
+    
     const x = Math.pow(1 + monthlyInterest, payments);
     const monthly = (principal * monthlyInterest * x) / (x - 1);
     
-    const monthlyPaymentRounded = Math.round(monthly);
-    const totalPaymentRounded = Math.round(monthly * payments);
-    const totalInterestRounded = Math.round((monthly * payments) - principal);
-    
-    setMonthlyPayment(monthlyPaymentRounded);
-    setTotalPayment(totalPaymentRounded);
-    setTotalInterest(totalInterestRounded);
+    setCalculationResult({
+      "Monthly Payment": Math.round(monthly),
+      "Yearly Payment": Math.round(monthly * 12),
+      "Money Enough": currentHouse["Money Available"] >= currentHouse["House Price"] * 0.2,
+      "Repayment Time": currentHouse["Term"],
+      "Profit Rate": Math.round((currentHouse["House Price"] * 0.03) / monthly * 100),
+      "Repayment Graph": Array.from({ length: currentHouse["Term"] }, (_, i) => 
+        Math.round(principal * (1 - (i / currentHouse["Term"])))
+      ),
+      "Risk Rate": Math.round((monthly / (currentHouse["House Price"] * 0.005)) * 100)
+    });
+  };
+
+  const updateHouse = (index: number, field: keyof ApiInput['Houses'][0], value: number) => {
+    const newHouses = [...houses];
+    newHouses[index] = {
+      ...newHouses[index],
+      [field]: value
+    };
+    setHouses(newHouses);
   };
 
   return (
@@ -69,7 +73,7 @@ const MortgageCalculator: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">Mortgage Calculator</h1>
         <p className="mt-2 text-slate-300">
-          Calculate your monthly mortgage payments and see the breakdown of your costs.
+          Calculate your mortgage payments and analyze investment potential.
         </p>
       </div>
 
@@ -77,105 +81,45 @@ const MortgageCalculator: React.FC = () => {
         <div className="lg:col-span-2">
           <Card className="p-6">
             <div className="space-y-6">
-              {/* Home Price */}
               <div>
-                <div className="flex justify-between mb-2">
-                  <label className="block text-sm font-medium text-slate-200">
-                    Home Price
-                  </label>
-                  <span className="text-sm text-slate-400">
-                    ${homePrice.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <DollarSign className="text-slate-400" size={18} />
-                  <Slider
-                    min={50000}
-                    max={2000000}
-                    step={10000}
-                    value={homePrice}
-                    onChange={handleHomePriceChange}
-                  />
-                </div>
-                <div className="mt-2">
-                  <NumberInput
-                    value={homePrice}
-                    onChange={handleHomePriceChange}
-                    min={50000}
-                    max={2000000}
-                    step={10000}
-                    prefix="$"
-                  />
-                </div>
+                <label className="block text-sm font-medium text-slate-200 mb-2">
+                  House Price
+                </label>
+                <NumberInput
+                  value={houses[0]["House Price"]}
+                  onChange={(value) => updateHouse(0, "House Price", value)}
+                  min={50000}
+                  max={2000000}
+                  step={10000}
+                  prefix="$"
+                />
               </div>
 
-              {/* Down Payment */}
               <div>
-                <div className="flex justify-between mb-2">
-                  <label className="block text-sm font-medium text-slate-200">
-                    Down Payment
-                  </label>
-                  <span className="text-sm text-slate-400">
-                    ${downPayment.toLocaleString()} ({downPaymentPercent}%)
-                  </span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <DollarSign className="text-slate-400" size={18} />
-                  <Slider
-                    min={0}
-                    max={homePrice}
-                    step={5000}
-                    value={downPayment}
-                    onChange={handleDownPaymentChange}
-                  />
-                </div>
-                <div className="mt-2 grid grid-cols-2 gap-4">
-                  <NumberInput
-                    value={downPayment}
-                    onChange={handleDownPaymentChange}
-                    min={0}
-                    max={homePrice}
-                    step={5000}
-                    prefix="$"
-                  />
-                  <NumberInput
-                    value={downPaymentPercent}
-                    onChange={handleDownPaymentPercentChange}
-                    min={0}
-                    max={100}
-                    step={1}
-                    suffix="%"
-                  />
-                </div>
+                <label className="block text-sm font-medium text-slate-200 mb-2">
+                  Money Available (Down Payment)
+                </label>
+                <NumberInput
+                  value={houses[0]["Money Available"]}
+                  onChange={(value) => updateHouse(0, "Money Available", value)}
+                  min={0}
+                  max={houses[0]["House Price"]}
+                  step={5000}
+                  prefix="$"
+                />
               </div>
 
-              {/* Loan Term */}
               <div>
-                <div className="flex justify-between mb-2">
-                  <label className="block text-sm font-medium text-slate-200">
-                    Loan Term
-                  </label>
-                  <span className="text-sm text-slate-400">
-                    {loanTerm} Years
-                  </span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Calendar className="text-slate-400" size={18} />
-                  <Slider
-                    min={5}
-                    max={30}
-                    step={5}
-                    value={loanTerm}
-                    onChange={setLoanTerm}
-                  />
-                </div>
-                <div className="flex mt-2 justify-between">
-                  {[5, 10, 15, 20, 25, 30].map((term) => (
+                <label className="block text-sm font-medium text-slate-200 mb-2">
+                  Term (Years)
+                </label>
+                <div className="flex justify-between">
+                  {[15, 20, 25, 30].map((term) => (
                     <button 
                       key={term}
-                      onClick={() => setLoanTerm(term)}
-                      className={`px-2 py-1 rounded text-xs ${
-                        loanTerm === term 
+                      onClick={() => updateHouse(0, "Term", term)}
+                      className={`px-4 py-2 rounded ${
+                        houses[0]["Term"] === term 
                           ? 'bg-blue-600 text-white' 
                           : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                       }`}
@@ -186,36 +130,18 @@ const MortgageCalculator: React.FC = () => {
                 </div>
               </div>
 
-              {/* Interest Rate */}
               <div>
-                <div className="flex justify-between mb-2">
-                  <label className="block text-sm font-medium text-slate-200">
-                    Interest Rate
-                  </label>
-                  <span className="text-sm text-slate-400">
-                    {interestRate}%
-                  </span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Percent className="text-slate-400" size={18} />
-                  <Slider
-                    min={1}
-                    max={10}
-                    step={0.1}
-                    value={interestRate}
-                    onChange={setInterestRate}
-                  />
-                </div>
-                <div className="mt-2">
-                  <NumberInput
-                    value={interestRate}
-                    onChange={setInterestRate}
-                    min={1}
-                    max={10}
-                    step={0.1}
-                    suffix="%"
-                  />
-                </div>
+                <label className="block text-sm font-medium text-slate-200 mb-2">
+                  Yearly Effective Tax Rate
+                </label>
+                <NumberInput
+                  value={houses[0]["Yearly Effective Tax Rate"]}
+                  onChange={(value) => updateHouse(0, "Yearly Effective Tax Rate", value)}
+                  min={1}
+                  max={10}
+                  step={0.1}
+                  suffix="%"
+                />
               </div>
             </div>
           </Card>
@@ -223,10 +149,14 @@ const MortgageCalculator: React.FC = () => {
 
         <div className="lg:col-span-1">
           <CalculationResult
-            loanAmount={homePrice - downPayment}
-            monthlyPayment={monthlyPayment}
-            totalPayment={totalPayment}
-            totalInterest={totalInterest}
+            loanAmount={houses[0]["House Price"] - houses[0]["Money Available"]}
+            monthlyPayment={calculationResult["Monthly Payment"]}
+            totalPayment={calculationResult["Yearly Payment"] * houses[0]["Term"]}
+            totalInterest={(calculationResult["Yearly Payment"] * houses[0]["Term"]) - 
+              (houses[0]["House Price"] - houses[0]["Money Available"])}
+            profitRate={calculationResult["Profit Rate"]}
+            riskRate={calculationResult["Risk Rate"]}
+            moneyEnough={calculationResult["Money Enough"]}
           />
         </div>
       </div>

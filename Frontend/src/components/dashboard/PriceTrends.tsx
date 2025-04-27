@@ -13,7 +13,7 @@ const PriceTrends: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-[1400px] mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">Price Trends & Forecast</h1>
         <p className="mt-2 text-slate-300">
@@ -21,15 +21,15 @@ const PriceTrends: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium text-white mb-4">Market Price Forecast (5-Year)</h3>
+      <div className="space-y-6">
+        <Card className="p-6">
+          <h3 className="text-lg font-medium text-white mb-4">Market Price Forecast (5-Year)</h3>
+          <div className="h-[600px]">
             <PriceTrendChart />
-          </Card>
-        </div>
+          </div>
+        </Card>
 
-        <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6">
             <h3 className="text-lg font-medium text-white mb-4">Top Growth Markets</h3>
             <div className="space-y-4">
@@ -56,7 +56,7 @@ const PriceTrends: React.FC = () => {
             </div>
           </Card>
 
-          <Card className="p-6 mt-6">
+          <Card className="p-6">
             <h3 className="text-lg font-medium text-white mb-4">Market Insights</h3>
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-blue-900/30 border border-blue-800/50">

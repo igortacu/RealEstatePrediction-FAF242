@@ -22,114 +22,185 @@ export const PriceTrendChart: React.FC = () => {
     { year: 2027, sanFrancisco: 1380000, newYork: 1045000, austin: 687500, seattle: 874000, miami: 710000 },
   ];
   
-  // Find the maximum value for scaling
   const allValues = [
     ...historicalData.flatMap(d => [d.sanFrancisco, d.newYork, d.austin, d.seattle, d.miami]),
     ...forecastData.flatMap(d => [d.sanFrancisco, d.newYork, d.austin, d.seattle, d.miami])
   ];
   const maxValue = Math.max(...allValues);
+  const minValue = Math.min(...allValues);
   
-  // Chart dimensions
-  const height = 300;
-  const getHeight = (value: number) => (value / maxValue) * height;
-
   const cities = [
-    { name: 'San Francisco', key: 'sanFrancisco', color: 'bg-blue-500', borderColor: 'border-blue-500' },
-    { name: 'New York', key: 'newYork', color: 'bg-purple-500', borderColor: 'border-purple-500' },
-    { name: 'Austin', key: 'austin', color: 'bg-green-500', borderColor: 'border-green-500' },
-    { name: 'Seattle', key: 'seattle', color: 'bg-yellow-500', borderColor: 'border-yellow-500' },
-    { name: 'Miami', key: 'miami', color: 'bg-red-500', borderColor: 'border-red-500' }
+    { name: 'San Francisco', key: 'sanFrancisco', color: 'bg-blue-500' },
+    { name: 'New York', key: 'newYork', color: 'bg-purple-500' },
+    { name: 'Austin', key: 'austin', color: 'bg-green-500' },
+    { name: 'Seattle', key: 'seattle', color: 'bg-amber-500' },
+    { name: 'Miami', key: 'miami', color: 'bg-rose-500' }
   ];
 
+  // Calculate positions for the line chart
+  const getYPosition = (value: number) => {
+    return ((value - minValue) / (maxValue - minValue)) * 100;
+  };
+
+  const getXPosition = (index: number, totalPoints: number) => {
+    return (index / (totalPoints - 1)) * 100;
+  };
+
   return (
-    <div>
-      <div className="flex justify-end space-x-4 mb-6">
+    <div className="relative h-full">
+      <div className="flex justify-end space-x-6 mb-8">
         {cities.map(city => (
           <div key={city.name} className="flex items-center">
-            <div className={`w-3 h-3 ${city.color} rounded-sm mr-2`}></div>
-            <span className="text-xs text-slate-300">{city.name}</span>
+            <div className={`w-4 h-4 rounded-sm ${city.color} mr-2`}></div>
+            <span className="text-sm font-medium text-slate-300">{city.name}</span>
           </div>
         ))}
       </div>
       
-      <div className="relative h-80 mt-8">
-        <div className="absolute left-0 top-0 bottom-0 w-px bg-slate-700"></div>
-        <div className="absolute left-0 bottom-0 right-0 h-px bg-slate-700"></div>
-        
-        {/* Y-axis labels */}
-        {[0, 0.25, 0.5, 0.75, 1].map(fraction => (
-          <div 
-            key={fraction}
-            className="absolute left-0 w-full h-px bg-slate-800"
-            style={{ bottom: `${fraction * 100}%` }}
-          >
-            <span className="absolute -left-14 -translate-y-1/2 text-xs text-slate-500">
-              ${Math.round(maxValue * fraction / 1000000)}M
-            </span>
-          </div>
-        ))}
+      <div className="relative h-[calc(100%-100px)] pl-20 pr-8">
+        {/* Y-axis labels and grid lines */}
+        {[0, 0.25, 0.5, 0.75, 1].map(fraction => {
+          const value = minValue + (maxValue - minValue) * fraction;
+          return (
+            <div 
+              key={fraction}
+              className="absolute left-0 w-full h-px bg-slate-800/30"
+              style={{ bottom: `${fraction * 100}%` }}
+            >
+              <span className="absolute -left-20 -translate-y-1/2 text-sm font-medium text-slate-500 whitespace-nowrap">
+                ${Math.round(value).toLocaleString()}
+              </span>
+              <div className="absolute left-0 w-full h-px bg-slate-700/20"></div>
+            </div>
+          );
+        })}
         
         {/* Chart area */}
-        <div className="ml-0 h-full flex items-end">
-          {/* Historical data */}
-          {historicalData.map((data, index) => (
-            <div 
-              key={`historical-${data.year}`} 
-              className="relative flex-1 flex items-end justify-center h-full group"
+        <div className="relative h-full">
+          {/* Historical data lines */}
+          {cities.map(city => (
+            <svg
+              key={`historical-${city.key}`}
+              className="absolute inset-0"
+              preserveAspectRatio="none"
+              viewBox="0 0 100 100"
             >
-              {cities.map((city, cityIndex) => (
+              <polyline
+                points={historicalData.map((data, i) => 
+                  `${getXPosition(i, historicalData.length)},${100 - getYPosition(data[city.key as keyof typeof data] as number)}`
+                ).join(' ')}
+                className={`${city.color} fill-none stroke-2`}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ))}
+
+          {/* Forecast data lines */}
+          {cities.map(city => (
+            <svg
+              key={`forecast-${city.key}`}
+              className="absolute inset-0"
+              preserveAspectRatio="none"
+              viewBox="0 0 100 100"
+            >
+              <polyline
+                points={forecastData.map((data, i) => 
+                  `${getXPosition(i + historicalData.length - 1, historicalData.length + forecastData.length - 1)},${100 - getYPosition(data[city.key as keyof typeof data] as number)}`
+                ).join(' ')}
+                className={`${city.color} fill-none stroke-2 stroke-dasharray-2`}
+                strokeWidth="2"
+                strokeDasharray="4 4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ))}
+
+          {/* Data points */}
+          {historicalData.map((data, dataIndex) => (
+            <React.Fragment key={`points-${data.year}`}>
+              {cities.map(city => (
                 <div
-                  key={`${data.year}-${city.key}`}
-                  className={`absolute w-1.5 ${city.color} rounded-t-sm transition-all duration-300 ease-out group-hover:w-2.5 group-hover:brightness-125`}
-                  style={{ 
-                    height: `${(data[city.key as keyof typeof data] as number) / maxValue * 100}%`,
-                    left: `calc(50% - ${6 - cityIndex * 3}px)`
+                  key={`point-${city.key}-${data.year}`}
+                  className={`absolute w-2 h-2 rounded-full ${city.color}`}
+                  style={{
+                    bottom: `${getYPosition(data[city.key as keyof typeof data] as number)}%`,
+                    left: `${getXPosition(dataIndex, historicalData.length)}%`,
+                    transform: 'translate(-50%, 50%)'
                   }}
-                  title={`${city.name} (${data.year}): $${(data[city.key as keyof typeof data] as number).toLocaleString()}`}
-                ></div>
+                />
               ))}
-              
-              {index === historicalData.length - 1 && (
-                <div className="absolute bottom-0 left-1/2 h-full w-px border-l border-dashed border-slate-500 z-10"></div>
-              )}
-              
-              <div className="absolute bottom-0 translate-y-full mt-2 text-xs text-slate-400">
+            </React.Fragment>
+          ))}
+
+          {/* Forecast points */}
+          {forecastData.slice(1).map((data, dataIndex) => (
+            <React.Fragment key={`forecast-points-${data.year}`}>
+              {cities.map(city => (
+                <div
+                  key={`forecast-point-${city.key}-${data.year}`}
+                  className={`absolute w-2 h-2 rounded-full ${city.color} ring-2 ring-offset-1 ring-offset-slate-900`}
+                  style={{
+                    bottom: `${getYPosition(data[city.key as keyof typeof data] as number)}%`,
+                    left: `${getXPosition(dataIndex + historicalData.length, historicalData.length + forecastData.length - 1)}%`,
+                    transform: 'translate(-50%, 50%)'
+                  }}
+                />
+              ))}
+            </React.Fragment>
+          ))}
+
+          {/* X-axis labels */}
+          <div className="absolute left-0 right-0 bottom-0 flex justify-between">
+            {historicalData.map((data, index) => (
+              <div
+                key={data.year}
+                className="absolute text-sm font-medium text-slate-400"
+                style={{
+                  left: `${getXPosition(index, historicalData.length)}%`,
+                  bottom: '-2rem',
+                  transform: 'translateX(-50%)'
+                }}
+              >
                 {data.year}
               </div>
-            </div>
-          ))}
-          
-          {/* Forecast data */}
-          {forecastData.slice(1).map((data, index) => (
-            <div 
-              key={`forecast-${data.year}`} 
-              className="relative flex-1 flex items-end justify-center h-full group"
-            >
-              {cities.map((city, cityIndex) => (
-                <div
-                  key={`${data.year}-${city.key}`}
-                  className={`absolute w-1.5 ${city.borderColor} bg-opacity-40 border border-dashed rounded-t-sm transition-all duration-300 ease-out group-hover:w-2.5 group-hover:brightness-125`}
-                  style={{ 
-                    height: `${(data[city.key as keyof typeof data] as number) / maxValue * 100}%`,
-                    left: `calc(50% - ${6 - cityIndex * 3}px)`
-                  }}
-                  title={`${city.name} (${data.year}): $${(data[city.key as keyof typeof data] as number).toLocaleString()}`}
-                ></div>
-              ))}
-              
-              <div className="absolute bottom-0 translate-y-full mt-2 text-xs text-slate-400">
+            ))}
+            {forecastData.slice(1).map((data, index) => (
+              <div
+                key={data.year}
+                className="absolute text-sm font-medium text-slate-400"
+                style={{
+                  left: `${getXPosition(index + historicalData.length, historicalData.length + forecastData.length - 1)}%`,
+                  bottom: '-2rem',
+                  transform: 'translateX(-50%)'
+                }}
+              >
                 {data.year}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Divider line between historical and forecast */}
+          <div 
+            className="absolute bottom-0 h-full w-px border-l-2 border-dashed border-slate-500/50"
+            style={{
+              left: `${getXPosition(historicalData.length - 1, historicalData.length + forecastData.length - 1)}%`
+            }}
+          />
         </div>
       </div>
       
-      <div className="flex justify-center mt-8 items-center text-xs text-slate-400">
-        <div className="w-3 h-1 bg-slate-400 mr-1"></div>
-        Historical Data
-        <div className="ml-4 w-3 h-1 border border-dashed border-slate-400 mr-1"></div>
-        Forecast (Based on AI Predictions)
+      <div className="flex justify-center mt-12 items-center space-x-8">
+        <div className="flex items-center">
+          <div className="w-8 h-0.5 bg-blue-500 mr-2"></div>
+          <span className="text-sm font-medium text-slate-300">Historical Data</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-8 h-0.5 bg-blue-500 mr-2" style={{ borderTop: '2px dashed' }}></div>
+          <span className="text-sm font-medium text-slate-300">AI-Powered Forecast</span>
+        </div>
       </div>
     </div>
   );
