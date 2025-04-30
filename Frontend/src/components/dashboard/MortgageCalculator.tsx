@@ -15,7 +15,9 @@ const MortgageCalculator: React.FC = () => {
     "Yearly Effective Tax Rate": 4,
     "Term": 30
   }]);
-  
+
+ 
+
   const [calculationResult, setCalculationResult] = useState<ApiOutput>({
     "Monthly Payment": 0,
     "Yearly Payment": 0,
@@ -27,14 +29,55 @@ const MortgageCalculator: React.FC = () => {
   });
 
   useEffect(() => {
+    const fetchMockData = async () => {
+      try {
+        const response = await fetch('https://api.mrfaf.info/api/mock', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        const jobj = await response.json();
+        // Use the mock data if needed
+        console.log('Mock data:', jobj);
+      } catch (error) {
+        console.error('Error fetching mock data:', error);
+      }
+    };
+    
+    fetchMockData();
+  }, []);
+
+
+  useEffect(() => {
     calculateMortgage();
   }, [houses, houseNumber]);
 
   const calculateMortgage = () => {
-    // Here we would normally make an API call with the input data
+    //! Here we would normally make an API call with the input data
     const apiInput: ApiInput = {
       "House Number": houseNumber,
       "Houses": houses
+    };
+
+    const fetchMockData = async () => {
+      try {
+        const response = await fetch('https://api.mrfaf.info/api/mock', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json', 
+          },
+        });
+        
+        const jobj = await response.json();
+        // Use the mock data if needed
+        console.log('Mock data:', jobj);
+        return jobj
+      } catch (error) {
+        console.error('Error fetching mock data:', error);
+        return null
+      }
     };
 
     // Temporary calculation logic until API is integrated
