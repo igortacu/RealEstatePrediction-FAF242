@@ -28,27 +28,6 @@ const MortgageCalculator: React.FC = () => {
     "Risk Rate": 0
   });
 
-  useEffect(() => {
-    const fetchMockData = async () => {
-      try {
-        const response = await fetch('https://api.mrfaf.info/api/mock', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          },
-        });
-        
-        const jobj = await response.json();
-        // Use the mock data if needed
-        console.log('Mock data:', jobj);
-      } catch (error) {
-        console.error('Error fetching mock data:', error);
-      }
-    };
-    
-    fetchMockData();
-  }, []);
-
 
   useEffect(() => {
     calculateMortgage();
@@ -61,24 +40,7 @@ const MortgageCalculator: React.FC = () => {
       "Houses": houses
     };
 
-    const fetchMockData = async () => {
-      try {
-        const response = await fetch('https://api.mrfaf.info/api/mock', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json', 
-          },
-        });
-        
-        const jobj = await response.json();
-        // Use the mock data if needed
-        console.log('Mock data:', jobj);
-        return jobj
-      } catch (error) {
-        console.error('Error fetching mock data:', error);
-        return null
-      }
-    };
+   
 
     // Temporary calculation logic until API is integrated
     const currentHouse = houses[0];
