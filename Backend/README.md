@@ -6,6 +6,9 @@
 
 To build the backend/api of the project you can use **make**  
 
+**Note**: makefile is only limited for linux at the moment. If you still want to run without any linux virtual machine you can use docker
+
+
 ```bash
 make
 ```
@@ -13,8 +16,6 @@ make
 ### To Run
 
 You can just run the executable after build.
-
-**Note**: makefile is only limited for linux at the moment. If you still want to run without any linux virtual machine you can use docker
 
 ### How to Docker
 
