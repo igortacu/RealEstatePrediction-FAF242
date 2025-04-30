@@ -210,8 +210,7 @@ OutputData calculate_output_data(InputData data) {
 
 cJSON *data_to_json(OutputData data) {
 
-    cJSON *root = cJSON_CreateObject();
-    cJSON *body = cJSON_AddObjectToObject(root, NULL);
+    cJSON *body = cJSON_CreateObject();
  
     cJSON_AddNumberToObject(body, "Monthly Payment", data.MonthlyPayment);
     cJSON_AddNumberToObject(body, "Yearly Payment", data.YearlyPayment);
@@ -227,6 +226,6 @@ cJSON *data_to_json(OutputData data) {
         cJSON_AddItemToArray(repayment_graph_arr, coeff);
     }
 
-    return root;
+    return body;
 }
 
