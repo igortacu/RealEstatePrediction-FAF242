@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Extrapolation/ExtrapolationOfIndex.h"
+#include "Extrapolation/HouseProfitCalculator.h"
 #include "models.h"
+
+CwebNamespace cweb;
 
 
 InputData deconstruct_input_json(cJSON *json) {
@@ -42,11 +45,12 @@ InputData deconstruct_input_json(cJSON *json) {
             return (InputData){.parsed = false, .response = cweb.response.send_text("Invalid House Number",404)};
         }
 
-        cJSON *avail_money = cJSON_GetObjectItemCaseSensitive(house, "Money Available");
-        cJSON *house_price = cJSON_GetObjectItemCaseSensitive(house, "House Price");
-        cJSON *tax_rate = cJSON_GetObjectItemCaseSensitive(house, "Tax Rate");
-        cJSON *yetRate = cJSON_GetObjectItemCaseSensitive(house, "Yearly Effective Tax Rate");
+        cJSON *avail_money = cJSON_GetObjectItemCaseSensitive(house, "Money Available"); 
+        cJSON *house_price = cJSON_GetObjectItemCaseSensitive(house, "House Price"); 
+        cJSON *tax_rate = cJSON_GetObjectItemCaseSensitive(house, "Tax Rate"); 
         cJSON *term = cJSON_GetObjectItemCaseSensitive(house, "Term");
+        cJSON *initial_rent = cJSON_GetObjectItemCaseSensitive(house, "Initial Rent");
+        cJSON *down_payment = cJSON_GetObjectItemCaseSensitive(house, "Down Payment");
 
         {
             if (!avail_money){
@@ -79,16 +83,6 @@ InputData deconstruct_input_json(cJSON *json) {
                 return (InputData){.parsed = false, .response = cweb.response.send_text("Tax Rate Available is not a number",404)};
             }
 
-            if (!yetRate){
-                free(houses_arr);
-                return (InputData){.parsed = false, .response = cweb.response.send_text("Yearly Effective Tax Rate not provided",404)};
-            }
-
-            if (yetRate->type != cJSON_Number){
-                free(houses_arr);
-                return (InputData){.parsed = false, .response = cweb.response.send_text("Yearly Effective Tax Rate is not a number",404)};
-            }
-
             if (!term){
                 free(houses_arr);
                 return (InputData){.parsed = false, .response = cweb.response.send_text("Term not provided",404)};
@@ -98,6 +92,26 @@ InputData deconstruct_input_json(cJSON *json) {
                 free(houses_arr);
                 return (InputData){.parsed = false, .response = cweb.response.send_text("Term is not a number",404)};
             }
+            
+            if (!initial_rent){
+                free(houses_arr);
+                return (InputData){.parsed = false, .response = cweb.response.send_text("Initital Rent not provided",404)};
+            }
+
+            if (initial_rent->type != cJSON_Number){
+                free(houses_arr);
+                return (InputData){.parsed = false, .response = cweb.response.send_text("Initital Rent is not a number",404)};
+            }
+            
+            if (!down_payment){
+                free(houses_arr);
+                return (InputData){.parsed = false, .response = cweb.response.send_text("Down Payment not provided",404)};
+            }
+
+            if (down_payment->type != cJSON_Number){
+                free(houses_arr);
+                return (InputData){.parsed = false, .response = cweb.response.send_text("Down Payment is not a number",404)};
+            }
         }
 
         House new_house = {
@@ -105,7 +119,8 @@ InputData deconstruct_input_json(cJSON *json) {
             .MoneyAvailable = avail_money->valuedouble,
             .TaxRate = tax_rate->valuedouble,
             .Term = term->valueint,
-            .YETRate = yetRate->valuedouble
+            .InitialRent = initial_rent->valuedouble,
+            .DownPayment = down_payment->valuedouble
         };
 
         houses_arr[i] = new_house;
@@ -116,10 +131,10 @@ InputData deconstruct_input_json(cJSON *json) {
         .houses = houses_arr
     };
 
-    CwebHttpResponse *response = cweb_send_text("json parsed", 200);
+    // CwebHttpResponse *response = cweb_send_text("json parsed", 200);
 
     return (InputData){
-        .response = response, 
+        .response = NULL, 
         .parsed = true,
         .json = input_json
     };
@@ -136,15 +151,18 @@ void print_input_json(InputJSON data) {
             "Money Available : %lf\n"
             "House Price : %lf\n"
             "Tax Rate : %lf\n"
-            "YETRate : %lf\n"
-            "Term : %d\n",
+            "Term : %d\n"
+            "Initial Rent : %lf\n"
+            "Down Payment : %lf\n",
             i+1,
             data.house_num,
             data.houses[i].MoneyAvailable,
             data.houses[i].HousePrice,
             data.houses[i].TaxRate,
-            data.houses[i].YETRate,
-            data.houses[i].Term
+            data.houses[i].Term,
+            data.houses[i].InitialRent,
+            data.houses[i].DownPayment
+            
         );
 
         printf("\n");
@@ -154,20 +172,71 @@ void print_input_json(InputJSON data) {
 
 }
 
-OutputData calculate_output_data(InputData data) {
+OutputData calculate_output_data(InputJSON data) {
 
-    /*To be Implemented*/
+    /*
+    TODO: add posibility to have prior money 
+    */
+
+
     OutputData out_data = {
-        /*The data to be replaced*/
-        .MoneyEnough = true,
-        .MonthlyPayment = 550.78,
-        .ProfitRate = 30.5,
-        .RepaymentGraph = malloc(sizeof(double)),
-        .RepaymentGraph_len = 1,
-        .RepaymentTime = 10,
-        .RiskRate = 12.4,
-        .YearlyPayment = 6609.36
+        .MonthlyPayment = 0,
+        .ProfitRate = 0, //Not set
+        .ProfitGraph = NULL, 
+        .ProfitGraph_len = 0,
+        .RepaymentTime = 0, //Not set
     };
+
+    int longest_term = 0;
+
+    for (int i = 0; i < data.house_num; i++) 
+        longest_term = longest_term < data.houses[i].Term ? data.houses[i].Term : longest_term;
+
+    printf("longest_term : %d\n", longest_term);
+
+    longest_term *= 12;
+
+    out_data.ProfitGraph = longest_term > 0 ? malloc(longest_term * sizeof(double)) : NULL;
+    
+    if (out_data.ProfitGraph != NULL) memset(out_data.ProfitGraph, 0, longest_term * sizeof(double));
+
+    
+    out_data.ProfitGraph_len = longest_term;
+    
+    double all_house_values = 0;
+    
+    PriceTrend trend = load_price_trend(longest_term);
+    
+    for (int i = 0; i < data.house_num; i++) {
+        
+        CalcResult res = calculate_house_profit(data.houses[i], trend);
+        
+        out_data.MonthlyPayment += res.Mortgage;
+        all_house_values += data.houses[i].HousePrice;
+        
+        // printf("");
+
+        for (int j = 0; j < res.ProfitGraph_len; j++) {
+            out_data.ProfitGraph[j] += res.ProfitGraph[j];
+        }
+        
+        // printf("Did Crash?\n");
+        free(res.ProfitGraph);
+    }
+    
+    
+    free(trend.price_multipliers);
+
+    printf("all_house_values : %lf\n", all_house_values);
+
+    out_data.ProfitRate = (out_data.ProfitGraph[longest_term - 1] / all_house_values) * 100;
+
+    for (int i = 0; i < out_data.ProfitGraph_len; i++) {
+        if (out_data.ProfitGraph[i] >= 0) {
+            out_data.RepaymentTime = i + 1;
+            break;
+        }
+    }
 
     return out_data;
 }
@@ -177,16 +246,13 @@ cJSON *data_to_json(OutputData data) {
     cJSON *body = cJSON_CreateObject();
  
     cJSON_AddNumberToObject(body, "Monthly Payment", data.MonthlyPayment);
-    cJSON_AddNumberToObject(body, "Yearly Payment", data.YearlyPayment);
     cJSON_AddNumberToObject(body, "Repayment Time", data.RepaymentTime);
     cJSON_AddNumberToObject(body, "Profit Rate", data.ProfitRate);
-    cJSON_AddNumberToObject(body, "Risk Rate", data.RiskRate);
-    cJSON_AddBoolToObject(body, "Money Enough", data.MoneyEnough);
 
-    cJSON *repayment_graph_arr = cJSON_AddArrayToObject(body, "Repayment Graph");
+    cJSON *repayment_graph_arr = cJSON_AddArrayToObject(body, "Profit Graph");
 
-    for (int i = 0; i < data.RepaymentGraph_len; i++) {
-        cJSON *coeff = cJSON_CreateNumber(data.RepaymentGraph[i]);
+    for (int i = 0; i < data.ProfitGraph_len; i++) {
+        cJSON *coeff = cJSON_CreateNumber(data.ProfitGraph[i]);
         cJSON_AddItemToArray(repayment_graph_arr, coeff);
     }
 

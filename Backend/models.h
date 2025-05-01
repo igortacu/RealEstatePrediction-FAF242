@@ -6,8 +6,9 @@
 typedef struct {
     double MoneyAvailable;
     double HousePrice;
-    double TaxRate; // R
-    double YETRate;
+    double TaxRate; // annual interest rate
+    double DownPayment;
+    double InitialRent;
     int Term; // N
 } House;
 
@@ -27,15 +28,10 @@ typedef struct
 typedef struct 
 {
     double MonthlyPayment;
-    double YearlyPayment;
     double ProfitRate;
-    double *RepaymentGraph;
-    double RiskRate;
-    int RepaymentGraph_len;
+    double *ProfitGraph;
+    int ProfitGraph_len;
     int RepaymentTime;
-    bool MoneyEnough;
 } OutputData;
-
-CwebNamespace cweb;
 
 #endif

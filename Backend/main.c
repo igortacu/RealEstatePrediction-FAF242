@@ -15,26 +15,26 @@ CwebHttpResponse *main_sever( CwebHttpRequest *request ) {
 
     if ((input_data = deconstruct_input_json(json)).parsed == true) {
         /*Do some stuff*/
-        out = calculate_output_data(input_data);
+        out = calculate_output_data(input_data.json);
 
         print_input_json(input_data.json);
 
     } else {
-        cJSON_Delete(json);
+        // cJSON_Delete(json);
         return input_data.response;
     }
 
     cJSON *out_json = data_to_json(out); 
 
-    cJSON_Delete(json); 
+    // cJSON_Delete(json); 
     free(input_data.json.houses);
-    free(out.RepaymentGraph);
+    free(out.ProfitGraph);
 
     return cweb.response.send_cJSON_cleaning_memory(out_json, 200);
 }
 
 
-int main(int argc, char *argv[]){
+int main(void){
     cweb = newCwebNamespace();
     CwebServer server = newCwebSever(5000, main_sever);
     
