@@ -1,44 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Dependencies/CWebStudio.h"
 #include "Extrapolation/ExtrapolationOfIndex.h"
+#include "models.h"
 
-typedef struct {
-    double MoneyAvailable;
-    double HousePrice;
-    double TaxRate;
-    double YETRate;
-    int Term;
-} House;
-
-typedef struct 
-{
-    int house_num;
-    House *houses;
-}InputJSON;
-
-typedef struct 
-{
-    InputJSON json;
-    bool parsed;
-    CwebHttpResponse *response;
-} InputData;
-
-typedef struct 
-{
-    double MonthlyPayment;
-    double YearlyPayment;
-    double ProfitRate;
-    double *RepaymentGraph;
-    double RiskRate;
-    int RepaymentGraph_len;
-    int RepaymentTime;
-    bool MoneyEnough;
-} OutputData;
-
-
-
-CwebNamespace cweb;
 
 InputData deconstruct_input_json(cJSON *json) {
 
