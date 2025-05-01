@@ -6,9 +6,9 @@
 typedef struct {
     double MoneyAvailable;
     double HousePrice;
-    double TaxRate;
+    double TaxRate; // R
     double YETRate;
-    int Term;
+    int Term; // N
 } House;
 
 typedef struct 
