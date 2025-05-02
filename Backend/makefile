@@ -15,17 +15,20 @@ endif
 
 all: main
 
-main: ExtrapolationOfIndex.o HouseProfitCalculator.o models.c main.c
+main: CWebStudioOne.o ExtrapolationOfIndex.o HouseProfitCalculator.o models.c main.c
 	$(CC) main.c \
 	Extrapolation$(SEP)ExtrapolationOfIndex.o \
 	Extrapolation$(SEP)HouseProfitCalculator.o \
 	Dependencies$(SEP)CWebStudioOne.o -o $(EXECUTABLE) -Wall -Wextra -pedantic -Werror -lm # -fsanitize=address 
 
-ExtrapolationOfIndex.o: Extrapolation/ExtrapolationOfIndex.c
+ExtrapolationOfIndex.o: Extrapolation$(SEP)ExtrapolationOfIndex.c
 	$(CC) -c Extrapolation$(SEP)ExtrapolationOfIndex.c -o Extrapolation$(SEP)ExtrapolationOfIndex.o -Wall -Wextra -pedantic -Werror -lm # -fsanitize=address 
 
-HouseProfitCalculator.o: Extrapolation/HouseProfitCalculator.c
+HouseProfitCalculator.o: Extrapolation$(SEP)HouseProfitCalculator.c
 	$(CC) -c Extrapolation$(SEP)HouseProfitCalculator.c -o Extrapolation$(SEP)HouseProfitCalculator.o -Wall -Wextra -pedantic -Werror # -fsanitize=address
+
+CWebStudioOne.o: Dependencies$(SEP)CWebStudioOne.c
+	$(CC) -c Dependencies$(SEP)CWebStudioOne.c -o Dependencies$(SEP)CWebStudioOne.o 
 
 clean:
 	$(RM) $(EXECUTABLE) Extrapolation$(SEP)*.o
