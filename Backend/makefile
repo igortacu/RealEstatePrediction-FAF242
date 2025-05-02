@@ -7,7 +7,7 @@ ifeq ($(OS),Windows_NT)
 	EXECUTABLE = main_server.exe
 	RM = del /Q
 	SEP := \\
-	CFLAGS=$(CFLAGS) -lws2_32
+	CFLAGS := $(CFLAGS) -lws2_32
 else
 	# Unix-like settings (keep your current setup)
 	CC = gcc
