@@ -1,3 +1,5 @@
+CFLAGS = -lm -Wall -Wextra -pedantic -Werror -Wno-unknown-pragmas 
+
 # Detect operating system
 ifeq ($(OS),Windows_NT)
 	# Windows-specific settings
@@ -5,6 +7,7 @@ ifeq ($(OS),Windows_NT)
 	EXECUTABLE = main_server.exe
 	RM = del /Q
 	SEP := \\
+	CFLAGS=$(CFLAGS) -lws2_32
 else
 	# Unix-like settings (keep your current setup)
 	CC = gcc
@@ -13,7 +16,6 @@ else
 	SEP = /
 endif
 
-CFLAGS = -lws2_32 -lm -Wall -Wextra -pedantic -Werror -Wno-unknown-pragmas 
 
 all: main
 
