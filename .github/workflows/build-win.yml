@@ -17,5 +17,5 @@ jobs:
       - name: CI-Build
         run: |
           echo 'Running in MSYS2!'
-          cd Backend\Build
+          cd Backend
           make
