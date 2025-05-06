@@ -101,8 +101,6 @@ CalcResult calculate_house_profit(House data, PriceTrend trend) {
     double *profit = simulate_sales(data, mortgage, trend);
     int profit_lenght = data.Term*12;
 
-    // Cleanup
-
     return (CalcResult){
         .Mortgage = mortgage,
         .ProfitGraph = profit,

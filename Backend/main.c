@@ -2,10 +2,6 @@
 
 int one_mega_byte = 1048576;
 
-/*
-    TODO: Implement the main logic of the program the function calculate_output_data()
-*/
-
 CwebHttpResponse *main_sever( CwebHttpRequest *request ) {
 
     cJSON *json  = cweb.request.read_cJSON(request,one_mega_byte);
@@ -20,7 +16,7 @@ CwebHttpResponse *main_sever( CwebHttpRequest *request ) {
         print_input_json(input_data.json);
 
     } else {
-        // cJSON_Delete(json);
+        // cJSON_Delete(json); BAD IDEA
         return input_data.response;
     }
 

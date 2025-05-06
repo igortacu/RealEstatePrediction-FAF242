@@ -10,7 +10,7 @@ CwebNamespace cweb;
 InputData deconstruct_input_json(cJSON *json) {
 
     if(!json){
-        return (InputData){.parsed = 0, .response = cweb.response.send_text("not passed or not valid json",404)};
+        return (InputData){.parsed = false, .response = cweb.response.send_text("not passed or not valid json",404)};
     }
 
     cJSON *house_num = cJSON_GetObjectItemCaseSensitive(json, "House Number");
@@ -175,16 +175,20 @@ void print_input_json(InputJSON data) {
 OutputData calculate_output_data(InputJSON data) {
 
     /*
-    TODO: add posibility to have prior money 
+    TODO: add posibility to have prior money Don't Think its vaiable
     */
-
+    for (int i = 0; i < data.house_num; i++) /*For now ignore MoneyAvailable*/
+    {
+        data.houses[i].MoneyAvailable = 0;
+    }
+    
 
     OutputData out_data = {
         .MonthlyPayment = 0,
-        .ProfitRate = 0, //Not set
+        .ProfitRate = 0, 
         .ProfitGraph = NULL, 
         .ProfitGraph_len = 0,
-        .RepaymentTime = 0, //Not set
+        .RepaymentTime = 0, 
     };
 
     int longest_term = 0;
@@ -199,7 +203,6 @@ OutputData calculate_output_data(InputJSON data) {
     out_data.ProfitGraph = longest_term > 0 ? malloc(longest_term * sizeof(double)) : NULL;
     
     if (out_data.ProfitGraph != NULL) memset(out_data.ProfitGraph, 0, longest_term * sizeof(double));
-
     
     out_data.ProfitGraph_len = longest_term;
     
@@ -214,16 +217,12 @@ OutputData calculate_output_data(InputJSON data) {
         out_data.MonthlyPayment += res.Mortgage;
         all_house_values += data.houses[i].HousePrice;
         
-        // printf("");
-
         for (int j = 0; j < res.ProfitGraph_len; j++) {
             out_data.ProfitGraph[j] += res.ProfitGraph[j];
         }
         
-        // printf("Did Crash?\n");
         free(res.ProfitGraph);
     }
-    
     
     free(trend.price_multipliers);
 

@@ -1,19 +1,21 @@
 CFLAGS = -lm -Wall -Wextra -pedantic -Werror -Wno-unknown-pragmas 
 
+BUILD_FOLDER = Build
+
 # Detect operating system
 ifeq ($(OS),Windows_NT)
 	# Windows-specific settings
 	CC = gcc
-	EXECUTABLE = main_server.exe
 	RM = del /Q
 	SEP := \\
 	CFLAGS=$(CFLAGS) -lws2_32
+	EXECUTABLE = $(BUILD_FOLDER)$(SEP)main_server.exe
 else
 	# Unix-like settings (keep your current setup)
 	CC = gcc
-	EXECUTABLE = main_server
 	RM = rm -f
 	SEP = /
+	EXECUTABLE = $(BUILD_FOLDER)$(SEP)main_server
 endif
 
 
