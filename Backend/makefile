@@ -8,8 +8,7 @@ ifeq ($(OS),Windows_NT)
 	CC = gcc
 	RM = del /Q
 	SEP := \\
-	CFLAGS=$(CFLAGS) -lws2_32
-	EXECUTABLE = $(BUILD_FOLDER)$(SEP)main_server.exe
+	CFLAGS := $(CFLAGS) -lws2_32
 else
 	# Unix-like settings (keep your current setup)
 	CC = gcc
