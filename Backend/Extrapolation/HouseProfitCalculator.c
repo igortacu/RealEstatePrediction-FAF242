@@ -63,7 +63,7 @@ double* simulate_sales(House house_data, double monthly_payment, PriceTrend tren
     // double monthly_payment = mortgage_calculator(house_data);
     int total_months = house_data.Term * 12;
 
-    double current_balance = house_data.MoneyAvailable;
+    double current_balance = 0;
     double* balance_history = malloc(total_months * sizeof(double));
     double remaining_loan = loan_amount;
     double current_sales_price = house_data.InitialRent;

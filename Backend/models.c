@@ -45,7 +45,7 @@ InputData deconstruct_input_json(cJSON *json) {
             return (InputData){.parsed = false, .response = cweb.response.send_text("Invalid House Number",404)};
         }
 
-        cJSON *avail_money = cJSON_GetObjectItemCaseSensitive(house, "Money Available"); 
+        // cJSON *avail_money = cJSON_GetObjectItemCaseSensitive(house, "Money Available"); 
         cJSON *house_price = cJSON_GetObjectItemCaseSensitive(house, "House Price"); 
         cJSON *tax_rate = cJSON_GetObjectItemCaseSensitive(house, "Tax Rate"); 
         cJSON *term = cJSON_GetObjectItemCaseSensitive(house, "Term");
@@ -53,15 +53,15 @@ InputData deconstruct_input_json(cJSON *json) {
         cJSON *down_payment = cJSON_GetObjectItemCaseSensitive(house, "Down Payment");
 
         {
-            if (!avail_money){
-                free(houses_arr);
-                return (InputData){.parsed = false, .response = cweb.response.send_text("Money Available not provided",404)};
-            }
+            // if (!avail_money){
+            //     free(houses_arr);
+            //     return (InputData){.parsed = false, .response = cweb.response.send_text("Money Available not provided",404)};
+            // }
 
-            if (avail_money->type != cJSON_Number){
-                free(houses_arr);
-                return (InputData){.parsed = false, .response = cweb.response.send_text("Money Available is not a number",404)};
-            }
+            // if (avail_money->type != cJSON_Number){
+            //     free(houses_arr);
+            //     return (InputData){.parsed = false, .response = cweb.response.send_text("Money Available is not a number",404)};
+            // }
 
             if (!house_price){
                 free(houses_arr);
@@ -116,7 +116,7 @@ InputData deconstruct_input_json(cJSON *json) {
 
         House new_house = {
             .HousePrice = house_price->valuedouble,
-            .MoneyAvailable = avail_money->valuedouble,
+            // .MoneyAvailable = avail_money->valuedouble,
             .TaxRate = tax_rate->valuedouble,
             .Term = term->valueint,
             .InitialRent = initial_rent->valuedouble,
@@ -156,7 +156,7 @@ void print_input_json(InputJSON data) {
             "Down Payment : %lf\n",
             i+1,
             data.house_num,
-            data.houses[i].MoneyAvailable,
+            // data.houses[i].MoneyAvailable,
             data.houses[i].HousePrice,
             data.houses[i].TaxRate,
             data.houses[i].Term,
@@ -175,12 +175,9 @@ void print_input_json(InputJSON data) {
 OutputData calculate_output_data(InputJSON data) {
 
     /*
-    TODO: add posibility to have prior money Don't Think its vaiable
+    TODO: add posibility to have prior money Don't Think its vaiable 
+    !For now commented all the lines with money available if some problem will happen we will revert
     */
-    for (int i = 0; i < data.house_num; i++) /*For now ignore MoneyAvailable*/
-    {
-        data.houses[i].MoneyAvailable = 0;
-    }
     
 
     OutputData out_data = {

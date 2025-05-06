@@ -4,7 +4,7 @@
 #include "Dependencies/CWebStudio.h"
 
 typedef struct {
-    double MoneyAvailable;
+    // double MoneyAvailable;
     double HousePrice;
     double TaxRate; // annual interest rate
     double DownPayment;
