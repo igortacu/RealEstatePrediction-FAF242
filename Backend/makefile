@@ -36,4 +36,4 @@ CWebStudioOne.o: Dependencies$(SEP)CWebStudioOne.c
 	$(CC) -c Dependencies$(SEP)CWebStudioOne.c -o Dependencies$(SEP)CWebStudioOne.o -lws2_32 
 
 clean:
-	$(RM) $(EXECUTABLE) Extrapolation$(SEP)*.o
+	$(RM) $(EXECUTABLE) Extrapolation$(SEP)*.o Dependencies$(SEP)*.o 

@@ -148,7 +148,7 @@ void print_input_json(InputJSON data) {
         printf(
             "House #%d\n"
             "House Number : %d\n"
-            "Money Available : %lf\n"
+            // "Money Available : %lf\n"
             "House Price : %lf\n"
             "Tax Rate : %lf\n"
             "Term : %d\n"
