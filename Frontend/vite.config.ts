@@ -1,10 +1,17 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
+  server: {
+    proxy: {
+      '/calculate': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+        // <-- strip /calculate off the front, so /calculate → ''
+        rewrite: (path) => path.replace(/^\/calculate/, ''),
+      },
+    },
   },
-});
+})

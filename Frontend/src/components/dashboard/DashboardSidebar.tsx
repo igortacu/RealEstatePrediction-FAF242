@@ -1,27 +1,30 @@
 import React from 'react';
 import { 
-  Home, 
-  LineChart, 
-  TrendingUp, 
-  Calculator, 
-  BarChart4, 
-  Lightbulb 
+  Home,
+  LineChart,
+  TrendingUp,
+  Calculator,
+  BarChart4,
+  Lightbulb,
+  Server
 } from 'lucide-react';
 
-type DashboardTab = 
+// Extend tab names to include API Demo
+export type DashboardTab = 
   | 'mortgage' 
   | 'investment' 
   | 'pricetrends' 
   | 'comparison' 
   | 'repayment' 
-  | 'recommendations';
+  | 'recommendations'
+  | 'apiDemo';
 
 interface DashboardSidebarProps {
   activeTab: DashboardTab;
   setActiveTab: (tab: DashboardTab) => void;
 }
 
-const sidebarItems = [
+const sidebarItems: { id: DashboardTab; name: string; icon: React.ReactNode }[] = [
   {
     id: 'mortgage',
     name: 'Mortgage Calculator',
@@ -52,6 +55,11 @@ const sidebarItems = [
     name: 'Recommendations',
     icon: <Lightbulb size={20} />,
   },
+  {
+    id: 'apiDemo',
+    name: 'API Demo',
+    icon: <Server size={20} />,
+  },
 ];
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activeTab, setActiveTab }) => {
@@ -63,7 +71,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activeTab, setActiv
           {sidebarItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id as DashboardTab)}
+              onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out ${
                 activeTab === item.id
                   ? 'bg-blue-600 text-white'

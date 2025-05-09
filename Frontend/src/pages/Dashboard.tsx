@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
-import DashboardSidebar from '../components/dashboard/DashboardSidebar';
+import DashboardSidebar, { DashboardTab } from '../components/dashboard/DashboardSidebar';
 import MortgageCalculator from '../components/dashboard/MortgageCalculator';
 import InvestmentAnalysis from '../components/dashboard/InvestmentAnalysis';
 import PriceTrends from '../components/dashboard/PriceTrends';
 import PropertyComparison from '../components/dashboard/PropertyComparison';
 import RepaymentCalculator from '../components/dashboard/RepaymentCalculator';
 import InvestmentRecommendations from '../components/dashboard/InvestmentRecommendations';
-
-type DashboardTab = 
-  | 'mortgage' 
-  | 'investment' 
-  | 'pricetrends' 
-  | 'comparison' 
-  | 'repayment' 
-  | 'recommendations';
+import ApiDemoPage from '../components/dashboard/ApiDemoPage';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('mortgage');
@@ -32,6 +25,8 @@ const Dashboard: React.FC = () => {
         return <RepaymentCalculator />;
       case 'recommendations':
         return <InvestmentRecommendations />;
+      case 'apiDemo':
+        return <ApiDemoPage />;
       default:
         return <MortgageCalculator />;
     }

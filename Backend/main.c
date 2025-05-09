@@ -4,6 +4,14 @@ int one_mega_byte = 1048576;
 
 CwebHttpResponse *main_sever( CwebHttpRequest *request ) {
 
+    if (strcmp(request->method, "OPTIONS") == 0) {
+        CwebHttpResponse *pre = cweb.response.send_text("", 204);
+        cweb.response.add_header(pre, "Access-Control-Allow-Origin", "*");
+        cweb.response.add_header(pre, "Access-Control-Allow-Methods", "POST, OPTIONS");
+        cweb.response.add_header(pre, "Access-Control-Allow-Headers", "Content-Type");
+        return pre;
+    }
+
     cJSON *json  = cweb.request.read_cJSON(request,one_mega_byte);
     
     InputData input_data;
@@ -26,7 +34,14 @@ CwebHttpResponse *main_sever( CwebHttpRequest *request ) {
     free(input_data.json.houses);
     free(out.ProfitGraph);
 
-    return cweb.response.send_cJSON_cleaning_memory(out_json, 200);
+    // build the response object
+CwebHttpResponse *res = cweb.response.send_cJSON_cleaning_memory(out_json, 200);
+
+// add the CORS header
+cweb.response.add_header(res, "Access-Control-Allow-Origin", "*");
+
+// finally return it
+return res;
 }
 
 
