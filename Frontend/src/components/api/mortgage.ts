@@ -1,7 +1,7 @@
 // src/api/mortgage.ts
 import type { ApiInput, ApiOutput } from '../../types/api'
 
-const BASE_URL = 'http://localhost:5000'    // ← your friend’s URL
+const BASE_URL = 'https://api.mrfaf.info'    // ← your friend’s URL
 
 export async function calculateMortgageApi(input: ApiInput): Promise<ApiOutput> {
   const res = await fetch(`${BASE_URL}/`, {

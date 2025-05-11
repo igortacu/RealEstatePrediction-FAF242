@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/calculate': {
-        target: 'http://localhost:5000',
+        target: 'https://api.mrfaf.info',
         changeOrigin: true,
         secure: false,
         // <-- strip /calculate off the front, so /calculate → ''

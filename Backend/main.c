@@ -35,13 +35,13 @@ CwebHttpResponse *main_sever( CwebHttpRequest *request ) {
     free(out.ProfitGraph);
 
     // build the response object
-CwebHttpResponse *res = cweb.response.send_cJSON_cleaning_memory(out_json, 200);
+    CwebHttpResponse *res = cweb.response.send_cJSON_cleaning_memory(out_json, 200);
 
-// add the CORS header
-cweb.response.add_header(res, "Access-Control-Allow-Origin", "*");
+    // add the CORS header
+    cweb.response.add_header(res, "Access-Control-Allow-Origin", "*");
 
-// finally return it
-return res;
+    // finally return it
+    return res;
 }
 
 

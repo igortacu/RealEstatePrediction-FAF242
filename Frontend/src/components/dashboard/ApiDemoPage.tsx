@@ -19,7 +19,7 @@ type ExtendedHouseInput = HouseInput & {
 const ApiDemoPage: React.FC = () => {
   const [houseNumber, setHouseNumber] = useState<number>(1);
   const [input, setInput] = useState<ExtendedHouseInput>({
-    "Money Available": 100000,
+    "Money Available": 0,
     "House Price": 500000,
     "Tax Rate": 5,
     "Yearly Effective Tax Rate": 4,
@@ -99,9 +99,9 @@ const ApiDemoPage: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">Response</h2>
           {output ? (
             <ul className="space-y-2">
-              <li>Monthly Payment: <span className="font-medium">{output["Monthly Payment"]}</span></li>
-              <li>Repayment Time: <span className="font-medium">{output["Repayment Time"]}</span></li>
-              <li>Profit Rate: <span className="font-medium">{output["Profit Rate"]}%</span></li>
+              <li>Monthly Payment: <span className="font-medium">{output["Monthly Payment"].toFixed(2)} MDL</span></li>
+              <li>Repayment Time: <span className="font-medium">{(output["Repayment Time"] / 4).toFixed(0)} Years</span></li>
+              <li>Profit Rate: <span className="font-medium">{output["Profit Rate"].toFixed(2)}%</span></li>
             </ul>
           ) : (
             <p className="text-gray-500">No data yet. Click "Send to API".</p>
@@ -117,8 +117,11 @@ const ApiDemoPage: React.FC = () => {
             <ResponsiveContainer>
               <LineChart data={graphData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
-                <XAxis dataKey="period" tick={{ fill: '#E5E7EB' }} />
-                <YAxis tick={{ fill: '#E5E7EB' }} />
+                <XAxis dataKey="period" tick={{ fill: '#E5E7EB' }} domain={['auto', 'auto']} />
+                <YAxis 
+                  tick={{ fill: '#E5E7EB' }} 
+                  domain={['auto', 'auto']} 
+                />
                 <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#E5E7EB' }} />
                 <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={2} dot={false} />
               </LineChart>
