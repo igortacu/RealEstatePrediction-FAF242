@@ -50,27 +50,28 @@ const features = [
 
 const testimonials = [
   {
-    id: 1,
-    quote: "I want to payoff my debt to USA asap",
-    name: "Volodîmîr Zelenski",
-    role: "First-time Investor",
-    avatarUrl: "https://preview.redd.it/e4nfqmo0pfk81.png?auto=webp&s=e666d105c98565e3f73034f23332354d29605cf5",
+    id: 4,
+    quote: "This tool has transformed how I manage my portfolio. I've never felt more confident in my investments!",
+    name: "Alice Johnson",
+    role: "Financial Analyst",
+    avatarUrl: "https://randomuser.me/api/portraits/women/68.jpg",
   },
   {
-    id: 2,
-    quote: "The prediction worked perfectly, now i can bomb ukraine again!",
-    name: "Vladimir Putin",
-    role: "Real Estate Developer",
-    avatarUrl: "https://content.imageresizer.com/images/memes/Putin-with-a-gun-meme-meme-9.jpg",
+    id: 6,
+    quote: "I recommended this platform to all my colleagues. The insights are simply unmatched.",
+    name: "Sofia Martinez",
+    role: "Marketing Manager",
+    avatarUrl: "https://randomuser.me/api/portraits/women/23.jpg",
   },
   {
-    id: 3,
-    quote: "The comparison tool saved me from making a costly investment mistake. Now i can put bigger tariffs!",
-    name: "Donald Trump",
-    role: "Property Portfolio Manager",
-    avatarUrl: "https://content.imageresizer.com/images/memes/Donald-Trump-mad-meme-4.jpg",
-  },
-];
+    id: 7,
+    quote: "The real-time analytics keep me ahead of the curve. Highly recommend to any savvy investor!",
+    name: "David Chen",
+    role: "Data Scientist",
+    avatarUrl: "https://randomuser.me/api/portraits/men/45.jpg",
+  }
+]
+
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   return (
